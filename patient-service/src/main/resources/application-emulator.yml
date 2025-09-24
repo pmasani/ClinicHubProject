@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: patient-service
+
+  cloud:
+    gcp:
+      project-id: emulator-project         # must match what you used with gcloud
+      spanner:
+        instance-id: test-instance         # must exist in the emulator
+        database: clinicdb                 # must exist in the emulator
+        emulator:
+          enabled: true                    # tells Spring to use the emulator
+
+server:
+  port: 8081

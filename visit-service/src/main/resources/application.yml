@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: visit-service
+server:
+  port: 8082
+
+patient:
+  service:
+    url: http://localhost:8081
+
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 3000
+        loggerLevel: basic
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
