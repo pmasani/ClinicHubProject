@@ -15,3 +15,4 @@ public record PatientDto(
         @Pattern(regexp = "^[0-9\\-+() ]{7,20}$") String phone,
         @NotBlank String status
 ) {}
+

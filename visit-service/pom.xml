@@ -3,25 +3,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- === This parent brings in all Spring Boot versions (deps + plugin) === -->
+    <!-- Boot parent wires correct, compatible versions for Spring, Integration, etc. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version> <!-- 3.3.x pairs with Spring Cloud 2023.0.x -->
-        <relativePath/>
+        <version>3.3.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.clinichub</groupId>
     <artifactId>visit-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>visit-service</name>
-    <description>ClinicHub Visit Service</description>
+    <description>Visit Service</description>
 
     <properties>
         <java.version>21</java.version>
     </properties>
 
-    <!-- Import Spring Cloud BOM so you can add spring-cloud* deps without versions -->
+    <!-- (Optional) If you’re also using Spring Cloud (Feign/Eureka), keep the BOM -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -45,8 +45,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-
-        <!-- OpenFeign for service-to-service calls -->
+        <!-- Feign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -56,6 +55,29 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Kafka (if present) -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- 🔽 MQTT: Spring Integration + MQTT adapter (no version; Boot manages) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mqtt</artifactId>
+        </dependency>
+
+        <!-- 🔽 Eclipse Paho v3 client (most common & available on Maven Central) -->
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.5</version>
         </dependency>
 
         <!-- Tests -->
@@ -74,4 +96,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Ensure Maven Central is used -->
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 </project>

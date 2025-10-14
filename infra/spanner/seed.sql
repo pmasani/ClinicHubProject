@@ -1,0 +1,16 @@
+-- -- DELETE ALL existing rows from the Patients table first
+--
+-- -- DELETE FROM patients WHERE TRUE;
+--
+-- -- Patients (10 fixed IDs so you can re-use them in demos)
+-- INSERT INTO patients (patient_id, first_name, last_name, dob, phone, status, updated_at) VALUES
+--                                                                                              ('11111111-1111-1111-1111-111111111111','Ava','Lee','2000-09-09','555-111','SCHEDULED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('22222222-2222-2222-2222-222222222222','Noah','Patel','1998-05-10','555-222','SCHEDULED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('33333333-3333-3333-3333-333333333333','Mia','Garcia','1995-12-01','555-333','SEATED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('44444444-4444-4444-4444-444444444444','Liam','Wong','1992-03-21','555-444','SEATED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('55555555-5555-5555-5555-555555555555','Sophia','Kim','1989-07-17','555-555','CHECKED_IN', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('66666666-6666-6666-6666-666666666666','Ethan','Nguyen','1997-08-08','555-666','CHECKED_IN', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('77777777-7777-7777-7777-777777777777','Olivia','Brown','2001-11-30','555-777','SCHEDULED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('88888888-8888-8888-8888-888888888888','Aarav','Khan','1994-02-14','555-888','SEATED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('99999999-9999-9999-9999-999999999999','Zara','Singh','1993-04-25','555-999','SCHEDULED', PENDING_COMMIT_TIMESTAMP()),
+--                                                                                              ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','Jack','Chen','1990-10-05','555-000','SEATED', PENDING_COMMIT_TIMESTAMP());

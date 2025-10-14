@@ -1,58 +1,53 @@
 package com.clinichub.patient_service;
 
+import com.clinichub.patient_service.service.PatientService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
-/**
- * REST CRUD API:
- * POST   /patients
- * GET    /patients
- * GET    /patients/{id}
- * PUT    /patients/{id}
- * DELETE /patients/{id}
- */
 @RestController
 @RequestMapping("/patients")
 public class PatientController {
 
-    private final PatientStore store;
+    private final PatientService service;
 
-    public PatientController(PatientStore store) {
-        this.store = store;
+    public PatientController(PatientService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody PatientDto dto) {
-        PatientDto saved = store.create(dto);
+    public ResponseEntity<PatientDto> create(@Valid @RequestBody PatientDto dto) {
+        var saved = service.create(dto);
         return ResponseEntity.created(URI.create("/patients/" + saved.patientId()))
                 .body(saved);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable String id) {
-        return store.get(id)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+    public ResponseEntity<PatientDto> get(@PathVariable String id) {
+        return service.get(id)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<?> list() {
-        return ResponseEntity.ok(store.list());
+    public List<PatientDto> list() {
+        return service.list();  // returns seeded rows from Spanner
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @Valid @RequestBody PatientDto dto) {
-        return store.update(id, dto)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+    public ResponseEntity<PatientDto> update(@PathVariable String id,
+                                             @Valid @RequestBody PatientDto dto) {
+        return service.update(id, dto)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        return store.delete(id)
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        return service.delete(id)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }

@@ -1,21 +1,31 @@
+// src/main/java/com/clinichub/visit_service/web/VisitController.java
 package com.clinichub.visit_service.web;
 
 import com.clinichub.visit_service.client.PatientClient;
 import com.clinichub.visit_service.client.PatientDto;
+import com.clinichub.visit_service.events.VisitEventProducer;
+import com.clinichub.visit_service.events.VisitStartedEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/visits")
 public class VisitController {
 
     private final PatientClient patientClient;
+    private final VisitEventProducer producer;
 
-    public VisitController(PatientClient patientClient) {
+    @Value("${clinic.kafka.topic}")
+    private String topic;
+
+    public VisitController(PatientClient patientClient, VisitEventProducer producer) {
         this.patientClient = patientClient;
+        this.producer = producer;
     }
 
     @PostMapping("/start")
@@ -27,14 +37,25 @@ public class VisitController {
                     "patientId", patientId
             ));
         }
-        PatientDto p = resp.getBody();
-        var event = Map.of(
-                "patientId", p.patientId(),
-                "patientName", p.firstName() + " " + p.lastName(),
-                "type", "VISIT_STARTED",
-                "at", Instant.now().toString()
+
+        PatientDto p = resp.getBody(); // assuming record-like accessors
+        var evt = new VisitStartedEvent(
+                UUID.randomUUID().toString(),
+                p.patientId(),
+                p.firstName() + " " + p.lastName(),
+                "VISIT_STARTED",
+                Instant.now().toString()
         );
-        return ResponseEntity.accepted().body(event);
+
+        producer.publish(topic, evt);
+
+        // Respond to caller with same info
+        return ResponseEntity.accepted().body(Map.of(
+                "patientId", evt.patientId(),
+                "patientName", evt.patientName(),
+                "type", evt.type(),
+                "at", evt.at().toString()
+        ));
     }
 
     @GetMapping("/{patientId}/status")

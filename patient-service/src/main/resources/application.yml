@@ -1,5 +1,21 @@
+#server:
+#  port: 8081
+#spring:
+#  application:
+#    name: patient-service
 server:
   port: 8081
+
 spring:
   application:
     name: patient-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info        # expose over HTTP
+  endpoint:
+    health:
+      show-details: always
+

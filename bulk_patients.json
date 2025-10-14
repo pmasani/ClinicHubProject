@@ -1,0 +1,5 @@
+[
+  {"firstName":"Ava","lastName":"Lee","dob":"2000-09-09","phone":"555-111","status":"SCHEDULED"},
+  {"firstName":"Noah","lastName":"Patel","dob":"1998-05-10","phone":"555-222","status":"SEATED"},
+  {"firstName":"Mia","lastName":"Garcia","dob":"1995-12-01","phone":"555-333","status":"SCHEDULED"}
+]

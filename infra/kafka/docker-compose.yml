@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: clinic-kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # ---- KRaft single-broker settings ----
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: "1"
+      KAFKA_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+
+      # Storage path (must match format step)
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+
+      # Convenience
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+      # >>> REQUIRED by Confluent entrypoint
+
+      CLUSTER_ID: "gx30E_vUQRWihnfJe8Y-SQ"   # <--- paste the ID you generated
+
+    # Format storage on first run; skip if already formatted
+    command:
+      - bash
+      - -c
+      - |
+        if [ ! -f /var/lib/kafka/data/meta.properties ] && [ ! -f /var/lib/kafka/data/__cluster_metadata-0/quorum-state ]; then
+          echo "Formatting KRaft storage with CLUSTER_ID=${CLUSTER_ID}"
+          kafka-storage format --config /etc/kafka/kafka.properties --cluster-id ${CLUSTER_ID}
+        else
+          echo "Storage already formatted."
+        fi
+        /etc/confluent/docker/run
+
+    # persist across restarts (recommended)
+    volumes:
+      - ./data:/var/lib/kafka/data
+
+    restart: unless-stopped
+
+

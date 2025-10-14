@@ -1,6 +1,19 @@
 spring:
   application:
     name: visit-service
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#      properties:
+#        spring.json.add.type.headers: false
+mqtt:
+  broker: tcp://localhost:1883
+  clientId: visit-service
+  topic: clinic/visits
+
 server:
   port: 8082
 
@@ -19,9 +32,14 @@ feign:
         connectTimeout: 2000
         readTimeout: 3000
         loggerLevel: basic
+#  retry:
+#    enabled: false
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+clinic:
+  kafka:
+    topic: visit-events

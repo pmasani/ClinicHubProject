@@ -2,14 +2,35 @@ spring:
   application:
     name: patient-service
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: patient-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"   # or your package for stricter security
+        spring.json.value.default.type: java.util.HashMap
+#        spring.json.use.type.headers: false
+
+
   cloud:
     gcp:
-      project-id: emulator-project         # must match what you used with gcloud
       spanner:
-        instance-id: test-instance         # must exist in the emulator
-        database: clinicdb                 # must exist in the emulator
+        project-id: demo-proj
+        instance-id: test-instance
+        database: clinicdb
         emulator:
-          enabled: true                    # tells Spring to use the emulator
-
+          enabled: true
+          host-port: localhost:9010
+logging:
+  level:
+    com.google.cloud.spring.data.spanner.core: DEBUG
+    com.google.cloud.spring.data.spanner.repository: DEBUG
+    org.springframework.cloud.gcp.data.spanner: DEBUG
 server:
   port: 8081
+
+clinic:
+  kafka:
+    topic: visit-events

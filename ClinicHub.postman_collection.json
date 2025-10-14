@@ -1,0 +1,280 @@
+{
+  "info": {
+    "name": "ClinicHub",
+    "_postman_id": "9c3c7c0a-aaaa-bbbb-cccc-1234567890ab",
+    "description": "ClinicHub demo: patient-service CRUD (Spanner), visit-service Feign call, bulk upsert.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Patient Service",
+      "item": [
+        {
+          "name": "GET List Patients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/patients"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => Array.isArray(pm.response.json()));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ava\",\n  \"lastName\": \"Lee\",\n  \"dob\": \"2000-09-09\",\n  \"phone\": \"555-111\",\n  \"status\": \"SCHEDULED\"\n}"
+            },
+            "url": "{{baseUrl}}/patients"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.expect(j.patientId).to.exist;",
+                  "pm.environment.set(\"patientId\", j.patientId);",
+                  "pm.test(\"Env patientId captured\", () => pm.environment.get(\"patientId\"));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Patient by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/patients/{{patientId}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('patientId')) {",
+                  "  throw new Error('patientId not set. Run POST Create Patient first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"IDs match\", () => pm.expect(pm.response.json().patientId).to.eql(pm.environment.get('patientId')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Patient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ava\",\n  \"lastName\": \"Lee\",\n  \"dob\": \"2000-09-09\",\n  \"phone\": \"555-333\",\n  \"status\": \"SEATED\"\n}"
+            },
+            "url": "{{baseUrl}}/patients/{{patientId}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('patientId')) {",
+                  "  throw new Error('patientId not set. Run POST Create Patient first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.expect(j.phone).to.eql(\"555-333\");",
+                  "pm.expect(j.status).to.eql(\"SEATED\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Patient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/patients/{{patientId}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('patientId')) {",
+                  "  throw new Error('patientId not set. Run POST Create Patient first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"204 No Content\", () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Visit Service",
+      "item": [
+        {
+          "name": "POST Start Visit",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{visitBaseUrl}}/visits/start",
+            "urlencoded": [
+              { "key": "patientId", "value": "{{patientId}}", "type": "text" }
+            ]
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('patientId')) {",
+                  "  throw new Error('patientId not set. Run POST Create Patient first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"202 Accepted\", () => pm.response.to.have.status(202));",
+                  "const j = pm.response.json();",
+                  "pm.expect(j.type).to.eql(\"VISIT_STARTED\");",
+                  "pm.expect(j.patientId).to.eql(pm.environment.get('patientId'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Visit Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{visitBaseUrl}}/visits/{{patientId}}/status"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('patientId')) {",
+                  "  throw new Error('patientId not set. Run POST Create Patient first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().patientId).to.eql(pm.environment.get('patientId'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bulk Operations",
+      "item": [
+        {
+          "name": "POST Bulk Upsert Patients",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[]"
+            },
+            "url": "{{baseUrl}}/patients/bulk/upsert"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const arr = pm.response.json();",
+                  "pm.expect(Array.isArray(arr)).to.be.true;",
+                  "pm.expect(arr.length).to.be.above(0);",
+                  "arr.forEach(p => pm.expect(p.patientId).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": []
+}
