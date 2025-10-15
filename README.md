@@ -6,10 +6,6 @@
 - **Patient Service** — keeps a simple list of patients.
 - **Visit Service** — keeps a simple list of doctor visits.
 
-You can ask these helpers to **create, read, update, or delete** patients and visits using easy web requests (called **REST APIs**).
-
-Demonstrating:
-
 - When **Visit Service** needs patient info, it calls **Patient Service** via **OpenFeign** (a safe, built-in HTTP client).
 - Data is stored locally using the **Google Cloud Spanner Emulator**, so you don’t need a real cloud account to try it.
 - Each change to a visit (created, updated, canceled) emits a **Kafka event** (`visit-events`) so other parts can react.
