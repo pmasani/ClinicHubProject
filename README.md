@@ -1,8 +1,6 @@
 
 # ClinicHub – Patient & Visit Microservices
 
-```markdown
-
 **ClinicHubProject** is a tiny example of a healthcare app. Think of it like two small helpers that talk to each other:
 
 - **Patient Service** — keeps a simple list of patients.
@@ -10,25 +8,7 @@
 
 You can ask these helpers to **create, read, update, or delete** patients and visits using easy web requests (called **REST APIs**).
 
-### How the pieces talk
-
-```
-
-+-------------------+          OpenFeign           +-------------------+
-|   Patient Service | <--------------------------> |    Visit Service  |
-|  (REST CRUD APIs) |                               |  (REST CRUD APIs) |
-|  /patients/...    |                               |  /visits/...      |
-+---------+---------+                               +---------+---------+
-|                                                     |
-|                              Kafka (visit-events)   |
-|                                  publish/subscribe  |
-|                                                     v
-+------+------------------+                        +------------------+
-| Google Cloud Spanner    |                        |  (Optional) MQTT |
-| Emulator (local storage)| <--- broadcast --->    |   subscribers    |
-+-------------------------+                        +------------------+
-
-```
+This project is a mini healthcare platform built with Spring Boot (Java 21), demonstrating:
 
 - When **Visit Service** needs patient info, it calls **Patient Service** via **OpenFeign** (a safe, built-in HTTP client).
 - Data is stored locally using the **Google Cloud Spanner Emulator**, so you don’t need a real cloud account to try it.
